@@ -19,20 +19,13 @@
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
     body { margin: 0; background: var(--bg); color: var(--on-surface); font-family: var(--font); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     
-    /* SCROLLABLE MAIN AREA */
-    main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+    main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 100px; }
     
-    /* HEADER */
     header { padding: 16px 20px; background: var(--surface); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 10; }
     .brand h1 { font-size: 18px; color: var(--primary); margin: 0; }
-    .brand p { margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-
-    /* CARDS & TASKS */
-    .card { background: var(--surface); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-    .hero-header { display: flex; justify-content: space-between; align-items: flex-start; }
-    .streak-badge { background: var(--surface-2); padding: 6px 12px; border-radius: 20px; font-weight: bold; border: 1px solid #333; font-size: 14px; }
     
-    .task-item { background: var(--surface-2); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; transition: background 0.2s; }
+    /* TASKS */
+    .task-item { background: var(--surface-2); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; }
     .task-row { display: flex; align-items: flex-start; gap: 16px; width: 100%; }
     
     .chk { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--muted); flex-shrink: 0; display: grid; place-items: center; margin-top: 2px; cursor: pointer; }
@@ -42,300 +35,237 @@
     .task-title { font-size: 16px; margin-bottom: 4px; font-weight: 500; }
     .task-meta { font-size: 11px; color: var(--primary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
     
-    /* EXPANDABLE DETAILS */
+    /* DETAILS */
     .details-box { 
       background: rgba(0,0,0,0.2); margin-top: 12px; padding: 12px; border-radius: 8px; 
       font-size: 13px; color: var(--muted); line-height: 1.6; display: none; 
       border-left: 2px solid var(--primary);
     }
     .task-item.expanded .details-box { display: block; }
-    .toggle-text { font-size: 11px; color: var(--muted); text-decoration: underline; margin-top: 4px; cursor: pointer; }
+    .toggle-text { font-size: 11px; color: var(--muted); text-decoration: underline; margin-top: 6px; cursor: pointer; }
 
-    /* SUB-LISTS inside Details */
     .sub-list { list-style: none; padding: 0; margin: 8px 0 0 0; }
     .sub-list li { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start; }
-    .sub-list li:before { content: "•"; color: var(--primary); }
+    .sub-list li:before { content: "•"; color: var(--primary); font-weight: bold; }
 
-    /* BOTTOM NAV */
+    /* NAV */
     nav.tabs { position: fixed; bottom: 0; width: 100%; background: var(--surface); display: flex; justify-content: space-around; padding: 10px 0 25px 0; border-top: 1px solid #333; z-index: 20; }
     .tab-btn { background: none; border: none; color: var(--muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 16px; border-radius: 20px; }
     .tab-btn.active { color: var(--primary); background: var(--primary-dim); }
-    .tab-icon { font-size: 20px; }
 
     /* UTILS */
     .btn { background: var(--primary); color: #000; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     .btn.ghost { background: transparent; color: var(--muted); }
-    
+    h3 { color: var(--primary); margin: 20px 0 10px 0; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
+
     /* DIALOG */
     dialog { background: var(--surface); color: white; border: none; border-radius: var(--radius); width: 90%; max-width: 400px; padding: 20px; }
-    dialog::backdrop { background: rgba(0,0,0,0.8); backdrop-filter: blur(2px); }
-    .chip-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
-    .chip { background: #333; padding: 8px 12px; border-radius: 20px; font-size: 13px; border: 1px solid transparent; cursor: pointer; }
+    dialog::backdrop { background: rgba(0,0,0,0.8); }
+    .chip { background: #333; padding: 8px 12px; border-radius: 20px; font-size: 13px; border: 1px solid transparent; cursor: pointer; margin: 5px; display: inline-block;}
     .chip.active { background: var(--primary-dim); color: var(--primary); border-color: var(--primary); }
   </style>
 </head>
 
 <body>
   <header>
-    <div class="brand">
-      <h1>Daily Guide</h1>
-      <p>Operating System</p>
-    </div>
-    <button class="btn ghost" onclick="document.getElementById('contextDialog').showModal()">☀️ Check-in</button>
+    <div class="brand"><h1>Daily Guide</h1></div>
+    <button class="btn ghost" onclick="document.getElementById('contextDialog').showModal()">Check-in</button>
   </header>
 
-  <main id="view">
-    </main>
-
+  <main id="view"></main>
   <nav class="tabs" id="navTabs"></nav>
 
   <dialog id="contextDialog">
     <form method="dialog">
-      <h3 style="margin-top:0">Morning Check-in</h3>
-      <p>Pain / Recovery Status:</p>
-      <div class="chip-group" id="painChips">
-        <div class="chip" onclick="app.setContext('pain', 'green', this)">🟢 Green (Good)</div>
-        <div class="chip" onclick="app.setContext('pain', 'yellow', this)">🟡 Yellow (Sore)</div>
-        <div class="chip" onclick="app.setContext('pain', 'red', this)">🔴 Red (Injured)</div>
-      </div>
+      <h3 style="margin-top:0">Context</h3>
+      <p>Pain Level:</p>
+      <div id="painChips"><span class="chip" onclick="app.setCtx('pain','green',this)">Green</span><span class="chip" onclick="app.setCtx('pain','yellow',this)">Yellow</span><span class="chip" onclick="app.setCtx('pain','red',this)">Red</span></div>
       <p>Environment:</p>
-      <div class="chip-group" id="envChips">
-        <div class="chip" onclick="app.setContext('env', 'home', this)">🏠 Home</div>
-        <div class="chip" onclick="app.setContext('env', 'gym', this)">🏋️ Gym</div>
-      </div>
-      <div style="margin-top:20px; text-align:right">
-        <button class="btn">Save</button>
-      </div>
+      <div id="envChips"><span class="chip" onclick="app.setCtx('env','home',this)">Home</span><span class="chip" onclick="app.setCtx('env','gym',this)">Gym</span></div>
+      <div style="margin-top:20px; text-align:right"><button class="btn">Done</button></div>
     </form>
   </dialog>
 
   <script>
-    // --- DATA FROM YOUR PDFs AND SUPPLEMENT LIST ---
+    // --- FULL DATASET FROM YOUR PDFS ---
     const GUIDE_DATA = {
       tabs: [
         { id: "today", label: "Today", icon: "📅" },
         { id: "rehab", label: "Rehab", icon: "🦴" },
-        { id: "workouts", label: "Training", icon: "💪" },
+        { id: "workouts", label: "Train", icon: "💪" },
+        { id: "diet", label: "Diet", icon: "🥗" },
         { id: "skills", label: "Skills", icon: "🎸" }
       ],
       tasks: [
         // --- MORNING ---
-        { 
-          id: "m_protocols", title: "Morning Rehab Protocols", block: "morning", tags: ["rehab", "core"],
-          why: "Prepares body structure", 
-          how: "Perform specific drills for neck and scapula.",
+        {
+          id: "m_rehab", title: "Morning Rehab & Structure", block: "morning", tags: ["rehab", "core"],
+          why: "Prepare body structure",
+          how: "Full sequence from Section 3.",
           details: [
-            "Neck: Scalene release & Sternocleidomastoid decompression",
+            "Neck: Scalene release & SCM decompression",
+            "Neck: First rib mobilization & Levator stretch",
             "Neck: Deep neck flexor activations",
-            "Diaphragm: Activation drills & Breath support",
-            "Scapula: Serratus anterior drills"
+            "Scapula: Serratus anterior drills",
+            "Diaphragm: Activation drills (Section 1)"
           ]
         },
-        { 
-          id: "m_supps", title: "Morning Stack", block: "morning", tags: ["supps"],
-          why: "Metabolism, Brain, Inflammation",
-          how: "Take with first meal/breakfast.",
+        {
+          id: "m_vocal", title: "Morning Vocal Warm-up", block: "morning", tags: ["skill"],
+          why: "Breath support & tone",
+          how: "Light activation only.",
+          details: ["Diaphragm activation", "Light vocal warm-up drills"]
+        },
+        {
+          id: "m_stack", title: "Morning Supplement Stack", block: "morning", tags: ["supps"],
+          why: "Metabolism & Brain",
+          how: "Take with breakfast.",
           details: [
             "Multivitamin (One A Day)",
-            "Vitamin D3 (5,000 IU) - Hormones",
-            "Omega-3 (Salmon Oil) - Inflammation",
-            "Choline + Inositol - Focus",
-            "Probiotic (Jarrow) - Gut Health",
-            "Optional: Acetyl-L-Carnitine (Fat burn)"
+            "Vitamin D3 (5,000 IU)",
+            "Omega-3 (Salmon Oil)",
+            "Choline + Inositol (Focus)",
+            "Probiotic (Jarrow)",
+            "Optional: Acetyl-L-Carnitine"
           ]
         },
 
         // --- MIDDAY / WORKOUT ---
-        { 
-          id: "w_prep", title: "Pre-Workout / Midday", block: "midday", tags: ["workout"],
+        {
+          id: "w_prep", title: "Pre-Workout Prep", block: "midday", tags: ["workout"],
           why: "Fuel & Activation",
-          how: "Prepare systems 30m before training.",
+          how: "30m before training.",
           details: [
-            "Creatine (5g) - Saturation",
-            "Protein (Whey Isolate) - Repair",
-            "Posture Reset (every 60-90 mins)",
-            "Knee Protocol: VMO activation"
+            "Creatine (5g)",
+            "Knee: VMO activation",
+            "Knee: Tibial internal/external rotation resets",
+            "Hip mobility check"
           ]
         },
-        { 
-          id: "w_upper", title: "Upper Body Strength", block: "midday", tags: ["workout"],
+        {
+          id: "w_session", title: "Training Session", block: "midday", tags: ["workout"],
           why: "Strength & Hypertrophy",
-          how: "Focus on form cues and safety notes.",
+          how: "Follow split (Upper/Lower/Core).",
           details: [
             "Warm-up: Scap circles & Rhomboid decompression",
-            "Main Lifts: Refer to PDF split",
-            "Rehab integration: Low trap activation between sets"
+            "Safety: Check form cues on main lifts",
+            "Rehab: Low trap activation between sets"
           ]
         },
-        { 
-          id: "diet_omad", title: "OMAD / Main Meal", block: "midday", tags: ["diet"],
-          why: "Anti-inflammatory & Weight Control",
-          how: "Target 185lb macro profile.",
+        {
+          id: "diet_main", title: "OMAD / Nutrition", block: "midday", tags: ["diet"],
+          why: "Weight Control (185lb target)",
+          how: "Anti-inflammatory focus.",
           details: [
-            "Anti-inflammatory focus",
+            "Hit Protein/Macro targets",
             "Low-cholesterol strategy",
-            "Hydration & Electrolytes"
+            "Electrolyte protocol",
+            "Hunger control management"
           ]
+        },
+        {
+          id: "w_reset", title: "Posture Resets", block: "midday", tags: ["rehab"],
+          why: "Prevent stiffness",
+          how: "Every 60-90 minutes.",
+          details: ["Thoracic extension", "Neck retraction", "Walk/Move"]
+        },
+        {
+          id: "mental_focus", title: "ADHD Focus Block", block: "midday", tags: ["mental"],
+          why: "Productivity",
+          how: "Phone detox micro-habits.",
+          details: ["Screen-down protocol", "Stress cycle completion technique"]
         },
 
         // --- EVENING ---
-        { 
-          id: "e_family", title: "Family System (3 & 5yo)", block: "evening", tags: ["family"],
+        {
+          id: "e_family", title: "Family System (Kids 3 & 5)", block: "evening", tags: ["family"],
           why: "Bonding & Development",
-          how: "Dedicated phone-free block.",
+          how: "Dedicated block.",
           details: [
-            "Ages 3 & 5 Rituals",
-            "Weekend: Restaurant activity training",
+            "Bonding rituals (Ages 3 & 5)",
+            "Restaurant activity training (Weekend prep)",
             "Couple connection routine"
           ]
         },
-        { 
-          id: "e_guitar", title: "Guitar Training", block: "evening", tags: ["skill"],
-          why: "Dexterity & Mastery",
-          how: "Follow Section 9 of Guide.",
+        {
+          id: "e_guitar", title: "Guitar Training System", block: "evening", tags: ["skill"],
+          why: "Mastery (Section 9)",
+          how: "Daily practice plan.",
           details: [
             "Finger dexterity drills",
-            "Beginner chord system practice",
+            "Beginner chord system",
             "Strumming mastery",
-            "Song-learning system"
+            "Singing + playing integration"
           ]
         },
-        { 
-          id: "e_vocal", title: "Advanced Singing", block: "evening", tags: ["skill"],
-          why: "Range & Tone",
-          how: "Section 4 Drills.",
+        {
+          id: "e_singing", title: "Advanced Singing", block: "evening", tags: ["skill"],
+          why: "Range & Tone (Section 4)",
+          how: "Drills & Practice.",
           details: [
             "False-fold rasp technique",
-            "Range mapping",
-            "Video practice flow"
+            "Range mapping & Key discovery",
+            "Video practice flow integration"
           ]
         },
-        { 
-          id: "e_stack", title: "Sleep Stack", block: "evening", tags: ["supps", "sleep"],
-          why: "Recovery & Cortisol Control",
-          how: "Take 45-60m before bed.",
+        {
+          id: "e_stack", title: "Sleep Stack & Recovery", block: "evening", tags: ["supps", "sleep"],
+          why: "Cortisol & Sleep",
+          how: "45-60m before bed.",
           details: [
-            "Ashwagandha (1,000 mg) - Stress/Cortisol",
-            "Magnesium Glycinate (200-400mg) - Relaxation",
-            "Optional: HMB (Muscle preservation)"
+            "Ashwagandha (1,000 mg)",
+            "Magnesium Glycinate (200-400mg)",
+            "Optional: HMB (Muscle preservation)",
+            "Phone detox"
           ]
         }
       ]
     };
 
-    // --- APP LOGIC ---
     const app = {
-      state: {
-        tab: 'today',
-        date: new Date().toLocaleDateString('en-CA'),
-        completions: JSON.parse(localStorage.getItem('mdg_done') || '{}'),
-        context: JSON.parse(localStorage.getItem('mdg_ctx') || '{"pain":"green","env":"home"}')
-      },
-      init() {
-        this.renderTabs();
-        this.renderView();
-        this.updateContextUI();
-      },
-      save() {
-        localStorage.setItem('mdg_done', JSON.stringify(this.state.completions));
-        localStorage.setItem('mdg_ctx', JSON.stringify(this.state.context));
-        this.renderView();
-      },
-      toggleTask(id) {
-        const key = `${this.state.date}_${id}`;
-        if (this.state.completions[key]) delete this.state.completions[key];
-        else this.state.completions[key] = true;
-        this.save();
-      },
-      setContext(type, val, el) {
-        this.state.context[type] = val;
-        this.updateContextUI();
-        this.save();
-      },
-      updateContextUI() {
-        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
-        // Re-highlight based on state (simplified for demo)
-        // In real app, match specific IDs
-      },
-      renderTabs() {
-        document.getElementById('navTabs').innerHTML = GUIDE_DATA.tabs.map(t => `
-          <button class="tab-btn ${this.state.tab === t.id ? 'active' : ''}" onclick="app.switchTab('${t.id}')">
-            <span class="tab-icon">${t.icon}</span>
-            <span>${t.label}</span>
-          </button>
-        `).join('');
-      },
-      switchTab(id) { this.state.tab = id; this.renderTabs(); this.renderView(); },
-      
-      renderView() {
-        const view = document.getElementById('view');
-        let tasksToShow = GUIDE_DATA.tasks;
-        
-        if (this.state.tab !== 'today') {
-           // Filter based on tab tags
-           const mapping = { 'rehab': ['rehab'], 'workouts': ['workout', 'diet'], 'skills': ['skill', 'family'] };
-           const tags = mapping[this.state.tab] || [];
-           tasksToShow = GUIDE_DATA.tasks.filter(t => t.tags.some(tag => tags.includes(tag)));
+      state: { tab: 'today', date: new Date().toLocaleDateString('en-CA'), completions: JSON.parse(localStorage.getItem('mdg_d')||'{}'), context: JSON.parse(localStorage.getItem('mdg_c')||'{}') },
+      init() { this.renderTabs(); this.render(); },
+      save() { localStorage.setItem('mdg_d', JSON.stringify(this.state.completions)); localStorage.setItem('mdg_c', JSON.stringify(this.state.context)); this.render(); },
+      toggle(id) { const k=`${this.state.date}_${id}`; this.state.completions[k] ? delete this.state.completions[k] : this.state.completions[k]=true; this.save(); },
+      setCtx(k,v,el) { this.state.context[k]=v; this.save(); },
+      renderTabs() { document.getElementById('navTabs').innerHTML=GUIDE_DATA.tabs.map(t=>`<button class="tab-btn ${this.state.tab===t.id?'active':''}" onclick="app.tab('${t.id}')">${t.icon}<br>${t.label}</button>`).join(''); },
+      tab(id) { this.state.tab=id; this.renderTabs(); this.render(); },
+      render() {
+        const v = document.getElementById('view');
+        let list = GUIDE_DATA.tasks;
+        if(this.state.tab!=='today') {
+           const map = {'rehab':['rehab'],'workouts':['workout'],'diet':['diet','supps'],'skills':['skill','family']};
+           list = list.filter(t=>t.tags.some(tag=>(map[this.state.tab]||[]).includes(tag)));
         }
-
-        const doneCount = GUIDE_DATA.tasks.filter(t => this.state.completions[`${this.state.date}_${t.id}`]).length;
-        const total = GUIDE_DATA.tasks.length;
+        const done = GUIDE_DATA.tasks.filter(t=>this.state.completions[`${this.state.date}_${t.id}`]).length;
         
-        let html = '';
-        if(this.state.tab === 'today') {
-           html += `
-             <div class="card hero-header">
-               <div class="brand">
-                 <h1>${new Date().toLocaleDateString('en-US', {weekday:'long', month:'short', day:'numeric'})}</h1>
-                 <p>${doneCount} / ${total} Tasks Complete</p>
-               </div>
-               <div class="streak-badge">🔥 ${doneCount > 0 ? 1 : 0}</div>
-             </div>
-           `;
-        }
-
-        const blocks = ['morning', 'midday', 'evening'];
-        blocks.forEach(block => {
-          const blockTasks = tasksToShow.filter(t => t.block === block);
-          if (blockTasks.length) {
-            html += `<h3 style="color:var(--primary); margin-top:20px; text-transform:capitalize">${block}</h3>`;
-            html += blockTasks.map(t => this.createTaskCard(t)).join('');
-          }
+        let h = this.state.tab==='today' ? `<div style="margin-bottom:20px"><h1>${new Date().toLocaleDateString('en-US',{weekday:'long'})}</h1><p>${done}/${GUIDE_DATA.tasks.length} Done</p></div>` : '';
+        
+        ['morning','midday','evening'].forEach(b => {
+           const bl = list.filter(t=>t.block===b);
+           if(bl.length) {
+             h += `<h3>${b}</h3>` + bl.map(t => {
+               const k = `${this.state.date}_${t.id}`;
+               const isDone = !!this.state.completions[k];
+               const dList = t.details ? `<ul class="sub-list">${t.details.map(d=>`<li>${d}</li>`).join('')}</ul>` : '';
+               return `<div class="task-item" onclick="this.classList.toggle('expanded')">
+                 <div class="task-row">
+                   <div class="chk ${isDone?'done':''}" onclick="event.stopPropagation();app.toggle('${t.id}')">${isDone?'✓':''}</div>
+                   <div class="task-content">
+                     <div class="task-title">${t.title}</div>
+                     <div class="task-meta">${t.tags.join(' • ')}</div>
+                     <div class="toggle-text">Details ▼</div>
+                   </div>
+                 </div>
+                 <div class="details-box"><b>Why:</b> ${t.why}<br><b>How:</b> ${t.how}${dList}</div>
+               </div>`;
+             }).join('');
+           }
         });
-        
-        if (html === '') html = '<p style="text-align:center; margin-top:50px">No tasks for this category.</p>';
-        view.innerHTML = html;
-      },
-
-      createTaskCard(t) {
-        const isDone = !!this.state.completions[`${this.state.date}_${t.id}`];
-        // Create Details List
-        const detailsHtml = t.details ? 
-          `<ul class="sub-list">${t.details.map(d => `<li>${d}</li>`).join('')}</ul>` : '';
-
-        return `
-          <div class="task-item ${isDone ? 'done' : ''}" onclick="this.classList.toggle('expanded')">
-            <div class="task-row">
-              <div class="chk ${isDone ? 'done' : ''}" onclick="event.stopPropagation(); app.toggleTask('${t.id}')">
-                ${isDone ? '✓' : ''}
-              </div>
-              <div class="task-content">
-                <div class="task-title">${t.title}</div>
-                <div class="task-meta">${t.tags.join(' • ')}</div>
-                <div class="toggle-text">Tap to view details</div>
-              </div>
-            </div>
-            <div class="details-box">
-              <strong>Why:</strong> ${t.why}<br>
-              <strong>How:</strong> ${t.how}
-              ${detailsHtml}
-            </div>
-          </div>
-        `;
+        v.innerHTML = h || '<p style="text-align:center;margin-top:40px">No tasks found.</p>';
       }
     };
     app.init();
   </script>
 </body>
 </html>
-
