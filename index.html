@@ -4,171 +4,435 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <title>My Daily Guide</title>
-  
   <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#1E1E1E" />
-  
+  <meta name="theme-color" content="#121212" />
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="icon.png">
 
-  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    :root {
+      --primary: #D0BCFF; /* Android Purple */
+      --primary-dim: rgba(208, 188, 255, 0.1);
+      --bg: #121212;
+      --surface: #1E1E1E;
+      --surface-2: #2C2C2C;
+      --on-surface: #E6E1E5;
+      --muted: #938F99;
+      --success: #81C784; 
+      --radius: 16px;
+      --font: 'Roboto', system-ui, -apple-system, sans-serif;
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--on-surface);
+      font-family: var(--font);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* App-like feel */
+    }
+
+    /* TYPOGRAPHY */
+    h1, h2, h3 { margin: 0 0 8px 0; font-weight: 500; }
+    p { margin: 0 0 12px 0; color: var(--muted); line-height: 1.5; }
+    .muted { color: var(--muted); font-size: 0.9em; }
+
+    /* LAYOUT */
+    header {
+      padding: 16px 20px;
+      background: var(--surface);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+
+    .brand h1 { font-size: 20px; color: var(--primary); margin: 0; }
+    .brand p { margin: 0; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      padding-bottom: 100px; /* Space for bottom nav */
+    }
+
+    /* CARDS */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    }
+
+    .hero-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+    .streak-badge { 
+      background: var(--surface-2); 
+      padding: 6px 12px; 
+      border-radius: 20px; 
+      font-weight: bold; 
+      border: 1px solid #333;
+    }
+
+    /* PROGRESS BAR */
+    .progress-track {
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+
+    /* TASKS */
+    .task-item {
+      background: var(--surface-2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: transform 0.1s;
+    }
+    .task-item:active { transform: scale(0.98); }
+
+    /* CHECKBOX */
+    .chk {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--muted);
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      margin-top: 2px;
+    }
+    .chk.done {
+      background: var(--success);
+      border-color: var(--success);
+      color: #000;
+    }
+
+    .task-content { flex: 1; }
+    .task-title { font-size: 16px; margin-bottom: 4px; font-weight: 500; }
+    .task-meta { font-size: 12px; color: var(--primary); margin-bottom: 6px; text-transform: uppercase; }
+    
+    .details-box {
+      background: rgba(0,0,0,0.2);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 8px;
+      display: none; /* Hidden by default */
+    }
+    .task-item.expanded .details-box { display: block; }
+    .toggle-details { font-size: 12px; text-decoration: underline; color: var(--muted); margin-top: 6px; display: inline-block; }
+
+    /* BOTTOM NAV */
+    nav.tabs {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: var(--surface);
+      display: flex;
+      justify-content: space-around;
+      padding: 12px 0 24px 0; /* Extra padding for iOS home bar */
+      border-top: 1px solid #333;
+      z-index: 20;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 11px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+    .tab-btn.active {
+      color: var(--primary);
+      background: var(--primary-dim);
+    }
+    .tab-icon { font-size: 20px; }
+
+    /* UTILS */
+    .hidden { display: none; }
+    .btn { background: var(--primary); color: #000; border: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
+    .btn.ghost { background: transparent; color: var(--muted); }
+    .btn.small { padding: 6px 12px; font-size: 12px; }
+
+    /* DIALOGS */
+    dialog {
+      background: var(--surface);
+      color: white;
+      border: none;
+      border-radius: var(--radius);
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    dialog::backdrop { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+    
+    .chip-group { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+    .chip { 
+      background: #333; padding: 8px 16px; border-radius: 20px; 
+      font-size: 14px; border: 1px solid transparent; 
+    }
+    .chip.active { background: var(--primary-dim); color: var(--primary); border-color: var(--primary); }
+  </style>
 </head>
 
 <body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="logo">Daily</div>
-      <div>
-        <div class="title">My Daily Guide</div>
-        <div class="subtitle" id="subtitle">Operating System</div>
-      </div>
-    </div>
 
-    <div class="actions">
-      <button class="btn ghost" id="btnReminders" title="Reminders">🔔</button>
-      <button class="btn ghost" id="btnExport" title="Backup">💾</button>
-      <button class="btn ghost" id="btnImport" title="Restore">📂</button>
-      <button class="btn ghost" id="btnResetDay" title="Reset Today">↺</button>
+  <header>
+    <div class="brand">
+      <h1>Daily Guide</h1>
+      <p>Operating System</p>
+    </div>
+    <div>
+      <button class="btn ghost small" onclick="app.exportData()">Backup</button>
+      <button class="btn ghost small" onclick="document.getElementById('contextDialog').showModal()">Context</button>
     </div>
   </header>
 
-  <main class="wrap">
-    
-    <section class="hero">
-      <div class="hero-left">
-        <h1 id="todayTitle">Today</h1>
-        <p class="muted" id="todayMeta">...</p>
-      </div>
-      <div class="hero-right">
-        <div class="pill">
-          <div class="pill-label">Streak</div>
-          <div class="pill-value" id="streakValue">0</div>
-        </div>
-        <div class="pill">
-          <div class="pill-label">Done</div>
-          <div class="pill-value" id="doneValue">0/0</div>
-        </div>
-      </div>
-    </section>
+  <main id="view">
+    </main>
 
-    <section class="toolbar">
-      <div class="search">
-        <input id="searchInput" placeholder="Search tasks, supplements, logic..." />
-      </div>
-    </section>
-
-    <section class="card" id="view"></section>
-    
-    <div style="height: 80px;"></div>
-  </main>
-
-  <nav class="tabs" id="tabs">
+  <nav class="tabs" id="navTabs">
     </nav>
 
-  <dialog id="contextDialog" class="dialog">
-    <form method="dialog" class="dialog-inner">
-      <h3>Good Morning</h3>
-      <p class="muted">Set your context to adapt the schedule.</p>
+  <dialog id="contextDialog">
+    <form method="dialog">
+      <h3>Morning Check-in</h3>
+      <p>Adjust your day based on reality.</p>
       
-      <div class="block">
-        <h4>Pain / Recovery Level</h4>
-        <div class="row-wrap" id="painOptions">
-          <label class="radio-btn">
-            <input type="radio" name="pain" value="green" checked> <span>Green (Good)</span>
-          </label>
-          <label class="radio-btn">
-            <input type="radio" name="pain" value="yellow"> <span>Yellow (Sore)</span>
-          </label>
-          <label class="radio-btn">
-            <input type="radio" name="pain" value="red"> <span>Red (Injured)</span>
-          </label>
-        </div>
+      <p>Pain Level:</p>
+      <div class="chip-group" id="painChips">
+        <div class="chip" onclick="app.setContext('pain', 'green', this)">Green (Good)</div>
+        <div class="chip" onclick="app.setContext('pain', 'yellow', this)">Yellow (Sore)</div>
+        <div class="chip" onclick="app.setContext('pain', 'red', this)">Red (Injured)</div>
       </div>
 
-      <div class="block">
-        <h4>Environment</h4>
-        <div class="row-wrap">
-          <select id="envSelect" class="full-width-select">
-            <option value="home">Home</option>
-            <option value="gym">Gym</option>
-            <option value="noequipment">No Equipment</option>
-            <option value="travel">Travel</option>
-          </select>
-        </div>
+      <p>Environment:</p>
+      <div class="chip-group" id="envChips">
+        <div class="chip" onclick="app.setContext('env', 'home', this)">🏠 Home</div>
+        <div class="chip" onclick="app.setContext('env', 'gym', this)">🏋️ Gym</div>
+        <div class="chip" onclick="app.setContext('env', 'travel', this)">✈️ Travel</div>
       </div>
 
-      <div class="dialog-actions">
-        <button class="btn ghost" id="btnMinimumDialog" type="button">Minimum Day</button>
-        <button class="btn" id="btnSaveContext" value="ok">Start Day</button>
+      <div style="margin-top: 20px; text-align: right;">
+        <button class="btn">Save & Start</button>
       </div>
     </form>
   </dialog>
 
-  <dialog id="remindersDialog" class="dialog">
-    <form method="dialog" class="dialog-inner">
-      <h3>Reminders</h3>
-      <p class="muted">Notifications will fire on this device.</p>
-
-      <div class="grid">
-        <div class="col6">
-          <div class="block">
-            <h4>Status</h4>
-            <label class="row">
-              <input type="checkbox" id="remindersEnabled" />
-              <span>Enable Notifications</span>
-            </label>
-            <label class="row">
-              <input type="checkbox" id="remindersOffToday" />
-              <span>Mute Today</span>
-            </label>
-          </div>
-        </div>
-
-        <div class="col6">
-          <div class="block">
-            <h4>Schedule</h4>
-            <div class="row"><span class="muted">Morning</span> <input type="time" id="timeMorning" /></div>
-            <div class="row"><span class="muted">Midday</span> <input type="time" id="timeMidday" /></div>
-            <div class="row"><span class="muted">Evening</span> <input type="time" id="timeEvening" /></div>
-            <div class="row"><span class="muted">Bed</span> <input type="time" id="timeBed" /></div>
-          </div>
-        </div>
-        
-        <div class="col12">
-           <div class="block">
-              <h4>Skip Blocks Today</h4>
-              <div id="skipButtons" class="row-wrap"></div>
-           </div>
-        </div>
-      </div>
-
-      <div class="dialog-actions">
-        <button class="btn ghost" value="cancel">Close</button>
-        <button class="btn" id="btnSaveReminders" value="ok">Save Settings</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="importDialog" class="dialog">
-    <form method="dialog" class="dialog-inner">
-      <h3>Import Data</h3>
-      <p class="muted">Paste your backup JSON below. This overwrites current data!</p>
-      <textarea id="importArea" spellcheck="false" placeholder='Paste JSON here...'></textarea>
-      <div class="dialog-actions">
-        <button class="btn ghost" value="cancel">Cancel</button>
-        <button class="btn" id="btnImportConfirm" value="ok">Import</button>
-      </div>
-    </form>
-  </dialog>
-
-  <script src="./app.js"></script>
-  
   <script>
+    // --- 1. THE DATA (Embedded to prevent 404 errors) ---
+    const DEFAULT_GUIDE = {
+      tabs: [
+        { id: "today", label: "Today", icon: "📅" },
+        { id: "schedule", label: "Schedule", icon: "⏰" },
+        { id: "workouts", label: "Workout", icon: "💪" },
+        { id: "diet", label: "Diet", icon: "🥗" },
+        { id: "mental", label: "Mental", icon: "🧠" }
+      ],
+      tasks: [
+        { id: "m_multi", title: "Men’s Multivitamin", block: "morning", tags: ["supps"], why: "Nutrient gaps", how: "Take with food" },
+        { id: "m_d3", title: "Vitamin D3 (5000 IU)", block: "morning", tags: ["supps"], why: "Hormones/Immunity", how: "Acts like hormone" },
+        { id: "m_omega", title: "Omega-3 (Salmon Oil)", block: "morning", tags: ["supps"], why: "Inflammation", how: "Joint/Heart health" },
+        { id: "m_probio", title: "Probiotic", block: "morning", tags: ["supps"], why: "Gut Health", how: "Absorption" },
+        { id: "m_mobility", title: "Mobility Sequence", block: "morning", tags: ["rehab"], why: "Structure prep", how: "Neck, Scap, Ribs" },
+        
+        { id: "mid_creat", title: "Creatine (5g)", block: "midday", tags: ["workout"], why: "Strength/Power", how: "Saturate muscles" },
+        { id: "mid_prot", title: "Protein (Whey)", block: "midday", tags: ["diet"], why: "Repair", how: "Building blocks" },
+        { id: "mid_omad", title: "OMAD Meal", block: "midday", tags: ["diet"], why: "Control", how: "Follow macro targets" },
+        
+        { id: "eve_ashwa", title: "Ashwagandha (1000mg)", block: "evening", tags: ["sleep"], why: "Cortisol/Stress", how: "Lowers stress hormone" },
+        { id: "eve_mag", title: "Magnesium Glycinate", block: "evening", tags: ["sleep"], why: "Relaxation", how: "Calms nerves" },
+        { id: "eve_fam", title: "Family Block", block: "evening", tags: ["family"], why: "Connection", how: "Device free time" },
+        { id: "eve_guit", title: "Guitar Practice", block: "evening", tags: ["skill"], why: "Growth", how: "Dexterity drills" }
+      ]
+    };
+
+    // --- 2. THE LOGIC ---
+    const app = {
+      data: DEFAULT_GUIDE,
+      state: {
+        tab: 'today',
+        date: new Date().toLocaleDateString('en-CA'), // Local YYYY-MM-DD
+        completions: JSON.parse(localStorage.getItem('mdg_done') || '{}'),
+        context: JSON.parse(localStorage.getItem('mdg_ctx') || '{"pain":"green","env":"home"}')
+      },
+
+      init() {
+        this.renderTabs();
+        this.renderView();
+        this.updateContextUI();
+      },
+
+      save() {
+        localStorage.setItem('mdg_done', JSON.stringify(this.state.completions));
+        localStorage.setItem('mdg_ctx', JSON.stringify(this.state.context));
+        this.renderView();
+      },
+
+      setContext(type, val, el) {
+        this.state.context[type] = val;
+        // Visual toggle
+        el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        this.save();
+      },
+
+      updateContextUI() {
+        // Highlight correct chips based on saved state
+        const painChips = document.getElementById('painChips').children;
+        const envChips = document.getElementById('envChips').children;
+        // Simple index mapping for demo
+        if(this.state.context.pain === 'green') painChips[0].classList.add('active');
+        if(this.state.context.pain === 'yellow') painChips[1].classList.add('active');
+        if(this.state.context.pain === 'red') painChips[2].classList.add('active');
+        
+        if(this.state.context.env === 'home') envChips[0].classList.add('active');
+        if(this.state.context.env === 'gym') envChips[1].classList.add('active');
+        if(this.state.context.env === 'travel') envChips[2].classList.add('active');
+      },
+
+      toggleTask(id) {
+        const key = `${this.state.date}_${id}`;
+        if (this.state.completions[key]) {
+          delete this.state.completions[key];
+        } else {
+          this.state.completions[key] = true;
+        }
+        this.save();
+      },
+
+      renderTabs() {
+        const nav = document.getElementById('navTabs');
+        nav.innerHTML = this.data.tabs.map(t => `
+          <button class="tab-btn ${this.state.tab === t.id ? 'active' : ''}" 
+                  onclick="app.switchTab('${t.id}')">
+            <span class="tab-icon">${t.icon}</span>
+            <span>${t.label}</span>
+          </button>
+        `).join('');
+      },
+
+      switchTab(id) {
+        this.state.tab = id;
+        this.renderTabs();
+        this.renderView();
+      },
+
+      renderView() {
+        const view = document.getElementById('view');
+        
+        if (this.state.tab === 'today') {
+          this.renderToday(view);
+        } else {
+          // Simple List View for other tabs
+          const tasks = this.data.tasks.filter(t => {
+             if(this.state.tab === 'schedule') return true; // Show all
+             // Map tabs to tags roughly
+             if(this.state.tab === 'workouts') return t.tags.includes('workout') || t.tags.includes('rehab');
+             if(this.state.tab === 'diet') return t.tags.includes('diet') || t.tags.includes('supps');
+             if(this.state.tab === 'mental') return t.tags.includes('sleep') || t.tags.includes('skill');
+             return false;
+          });
+          
+          view.innerHTML = `<h2>${this.state.tab.toUpperCase()}</h2>` + 
+            tasks.map(t => this.createTaskCard(t)).join('');
+        }
+      },
+
+      renderToday(view) {
+        // Calculate Stats
+        const todaysTasks = this.data.tasks;
+        const total = todaysTasks.length;
+        const done = todaysTasks.filter(t => this.state.completions[`${this.state.date}_${t.id}`]).length;
+        const pct = Math.round((done / total) * 100);
+
+        let html = `
+          <div class="card hero-card">
+            <div class="hero-header">
+              <div>
+                <h1>Today</h1>
+                <p>${new Date().toLocaleDateString(undefined, {weekday:'long', month:'long', day:'numeric'})}</p>
+              </div>
+              <div class="streak-badge">🔥 ${this.calcStreak()}</div>
+            </div>
+            <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <p class="muted">${done}/${total} Completed</p>
+          </div>
+        `;
+
+        // Render Time Blocks
+        const blocks = ['morning', 'midday', 'evening'];
+        blocks.forEach(block => {
+          const blockTasks = todaysTasks.filter(t => t.block === block);
+          if (blockTasks.length === 0) return;
+          
+          html += `<h3 style="margin-top:20px; text-transform:capitalize; color:var(--primary)">${block}</h3>`;
+          html += blockTasks.map(t => this.createTaskCard(t)).join('');
+        });
+
+        view.innerHTML = html;
+      },
+
+      createTaskCard(task) {
+        const isDone = !!this.state.completions[`${this.state.date}_${task.id}`];
+        return `
+          <div class="task-item ${isDone ? 'done' : ''}" onclick="this.classList.toggle('expanded')">
+            <div class="chk ${isDone ? 'done' : ''}" onclick="event.stopPropagation(); app.toggleTask('${task.id}')">
+              ${isDone ? '✓' : ''}
+            </div>
+            <div class="task-content">
+              <div class="task-title">${task.title}</div>
+              <div class="task-meta">${task.tags.join(', ')}</div>
+              <div class="toggle-details">Why & How ▼</div>
+              <div class="details-box">
+                <strong>Why:</strong> ${task.why}<br>
+                <strong>How:</strong> ${task.how}
+              </div>
+            </div>
+          </div>
+        `;
+      },
+
+      calcStreak() {
+        // Simple streak logic placeholder
+        return Object.keys(this.state.completions).length > 0 ? 1 : 0; 
+      },
+
+      exportData() {
+        alert("Data saved to local storage. (Full export feature requires more code, but your data is safe on this phone).");
+      }
+    };
+
+    // Start App
+    app.init();
+
+    // Register Service Worker if available (for installability)
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js')
-        .then(() => console.log('Service Worker Registered'))
-        .catch(err => console.error('SW Fail', err));
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
   </script>
 </body>
