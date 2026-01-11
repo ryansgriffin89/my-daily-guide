@@ -1,4 +1,4 @@
-const CACHE_NAME = "mdg-cache-v2";
+const CACHE_NAME = "mdg-app-v2"; // Changed version to force update
 const ASSETS = [
   "./",
   "./index.html",
@@ -8,22 +8,45 @@ const ASSETS = [
   "./manifest.webmanifest"
 ];
 
+// Install: Cache core files
 self.addEventListener("install", (event) => {
+  self.skipWaiting(); // Force this SW to become active immediately
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).catch(() => {})
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
+// Activate: Clean up old caches
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : Promise.resolve())))
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) return caches.delete(key);
+        })
+      )
     )
   );
+  self.clients.claim();
 });
 
+// Fetch: NETWORK FIRST, then Cache (Fixes the "Stale Data" bug)
 self.addEventListener("fetch", (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
-  );
+  // For the JSON guide, always try network first
+  if (event.request.url.includes("guide.json")) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+  } else {
+    // For everything else (CSS/JS), try network, fall back to cache
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+  }
 });
