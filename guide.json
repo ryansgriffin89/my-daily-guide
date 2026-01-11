@@ -1,1 +1,215 @@
+{
+  "version": 1,
+  "appName": "My Daily Guide",
+  "tabs": [
+    { "id": "today", "label": "Today" },
+    { "id": "schedule", "label": "Schedule" },
+    { "id": "workouts", "label": "Workouts" },
+    { "id": "rehab", "label": "Rehab" },
+    { "id": "diet", "label": "Diet" },
+    { "id": "supplements", "label": "Supplements" },
+    { "id": "faith", "label": "Faith" },
+    { "id": "family", "label": "Family" },
+    { "id": "mental", "label": "Mental" },
+    { "id": "skills", "label": "Skills" }
+  ],
+  "modules": [
+    {
+      "id": "sec_schedule",
+      "moduleId": "schedule",
+      "title": "DAILY SCHEDULE (Detailed)",
+      "referenceText": "Wake ~6:30a\nWork 7a–4/5p\nWorkout usually at night\n\nGuiding structure:\n- Morning: baseline + gut + focus\n- Midday: protein anchor, movement/reset\n- Evening: workout + recovery\n- Bed: winddown + sleep support\n\nMinimum Day:\n- Do the smallest version to keep momentum (no guilt)."
+    }
+  ],
+  "tasks": [
+    {
+      "id": "water_meds",
+      "moduleId": "schedule",
+      "title": "Hydration + meds (baseline)",
+      "timeBlock": "morning",
+      "durationMin": 3,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Stabilizes energy/focus and reduces headache/fatigue risk.",
+      "how": "Water supports circulation and brain function; consistent baseline timing keeps your day steady.",
+      "tags": ["baseline"]
+    },
 
+    {
+      "id": "multi",
+      "moduleId": "supplements",
+      "title": "Men’s Multivitamin (One A Day)",
+      "timeBlock": "morning",
+      "durationMin": 1,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Covers vitamin/mineral gaps.",
+      "how": "Supplies nutrients your body can’t make → keeps metabolism, hormones, and energy systems running properly.",
+      "tags": ["supplement", "morning"]
+    },
+    {
+      "id": "d3",
+      "moduleId": "supplements",
+      "title": "Vitamin D3 – 5,000 IU",
+      "timeBlock": "morning",
+      "durationMin": 1,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Mood, hormones, immune system.",
+      "how": "Acts like a hormone → signals many systems to work correctly.",
+      "tags": ["supplement", "morning"]
+    },
+    {
+      "id": "omega3",
+      "moduleId": "supplements",
+      "title": "Omega-3 (Salmon Oil)",
+      "timeBlock": "morning",
+      "durationMin": 1,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Heart, brain, inflammation control.",
+      "how": "Reduces inflammation in blood vessels & joints → helps recovery and cholesterol balance.",
+      "tags": ["supplement", "morning"]
+    },
+    {
+      "id": "choline_inositol",
+      "moduleId": "supplements",
+      "title": "Choline + Inositol",
+      "timeBlock": "morning",
+      "durationMin": 1,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Focus, brain function.",
+      "how": "Helps brain cells communicate more efficiently.",
+      "tags": ["supplement", "morning"]
+    },
+    {
+      "id": "probiotic",
+      "moduleId": "supplements",
+      "title": "Probiotic (Jarrow Ideal Bowel Support)",
+      "timeBlock": "morning",
+      "durationMin": 1,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Digestion & nutrient absorption.",
+      "how": "Adds good gut bacteria so food and supplements absorb better.",
+      "tags": ["supplement", "morning"]
+    },
+    {
+      "id": "alcar",
+      "moduleId": "supplements",
+      "title": "Acetyl-L-Carnitine (optional)",
+      "timeBlock": "morning",
+      "durationMin": 1,
+      "priority": "optional",
+      "frequency": "daily",
+      "why": "Fat burning & mental clarity.",
+      "how": "Moves fat into cells so it can be burned for energy.",
+      "tags": ["supplement", "optional", "morning"]
+    },
+
+    {
+      "id": "creatine",
+      "moduleId": "supplements",
+      "title": "Creatine – 5g",
+      "timeBlock": "evening",
+      "durationMin": 1,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Strength & muscle growth.",
+      "how": "Stored in muscles like extra battery power → better workouts = more muscle.",
+      "tags": ["supplement", "workout"]
+    },
+    {
+      "id": "eaa",
+      "moduleId": "supplements",
+      "title": "EAA (optional)",
+      "timeBlock": "evening",
+      "durationMin": 1,
+      "priority": "optional",
+      "frequency": "daily",
+      "why": "Muscle protection if training fasted.",
+      "how": "Delivers muscle-building amino acids directly.",
+      "tags": ["supplement", "optional", "workout"]
+    },
+    {
+      "id": "whey",
+      "moduleId": "supplements",
+      "title": "Protein (Whey Isolate)",
+      "timeBlock": "evening",
+      "durationMin": 3,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Muscle repair & fat loss.",
+      "how": "Breaks into amino acids → used as building blocks for muscle.",
+      "tags": ["supplement", "protein", "workout"]
+    },
+
+    {
+      "id": "ashwagandha",
+      "moduleId": "supplements",
+      "title": "Ashwagandha – 1,000 mg",
+      "timeBlock": "bed",
+      "durationMin": 1,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Stress, anxiety, sleep.",
+      "how": "Lowers cortisol (stress hormone that promotes fat storage).",
+      "tags": ["supplement", "sleep"]
+    },
+    {
+      "id": "mag_gly",
+      "moduleId": "supplements",
+      "title": "Magnesium Glycinate – 200–400 mg",
+      "timeBlock": "bed",
+      "durationMin": 1,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Sleep, relaxation, muscle recovery.",
+      "how": "Calms nerves and relaxes muscles after stress & alcohol.",
+      "tags": ["supplement", "sleep"]
+    },
+    {
+      "id": "hmb",
+      "moduleId": "supplements",
+      "title": "HMB (optional)",
+      "timeBlock": "bed",
+      "durationMin": 1,
+      "priority": "optional",
+      "frequency": "daily",
+      "why": "Prevents muscle loss while dieting.",
+      "how": "Signals muscles not to break down during stress.",
+      "tags": ["supplement", "optional", "sleep"]
+    },
+
+    {
+      "id": "family_block",
+      "moduleId": "family",
+      "title": "Family block (protected)",
+      "timeBlock": "evening",
+      "durationMin": 30,
+      "priority": "core",
+      "frequency": "daily",
+      "why": "Protects what matters most and keeps work from consuming the day.",
+      "how": "A dedicated block reduces stress and strengthens relationships through consistent presence.",
+      "tags": ["family", "protected"]
+    }
+  ],
+  "settings": {
+    "timeBlocks": {
+      "morning": { "start": "05:00", "end": "11:59" },
+      "midday": { "start": "12:00", "end": "16:59" },
+      "evening": { "start": "17:00", "end": "20:59" },
+      "bed": { "start": "21:00", "end": "04:59" }
+    },
+    "reminders": {
+      "enabled": true,
+      "times": {
+        "morning": "08:00",
+        "midday": "12:00",
+        "evening": "18:00",
+        "bed": "21:30"
+      }
+    }
+  }
+}
