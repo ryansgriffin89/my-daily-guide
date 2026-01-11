@@ -1,1 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Daily Guide</title>
 
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#0b0b12" />
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">◎</div>
+      <div>
+        <div class="title">My Daily Guide</div>
+        <div class="subtitle" id="subtitle">Standalone daily operating system</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn ghost" id="btnReminders">Reminders</button>
+      <button class="btn ghost" id="btnMinimum">Minimum Day</button>
+      <button class="btn ghost" id="btnResetDay">Reset Day</button>
+      <button class="btn ghost" id="btnExport">Export</button>
+      <button class="btn ghost" id="btnImport">Import</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-left">
+        <h1 id="todayTitle">Today</h1>
+        <p class="muted" id="todayMeta"></p>
+      </div>
+
+      <div class="hero-right">
+        <div class="pill">
+          <div class="pill-label">Day</div>
+          <div class="pill-value" id="dayBadge">—</div>
+        </div>
+        <div class="pill">
+          <div class="pill-label">Streak</div>
+          <div class="pill-value" id="streakValue">0</div>
+        </div>
+        <div class="pill">
+          <div class="pill-label">Done</div>
+          <div class="pill-value" id="doneValue">0/0</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="toolbar">
+      <div class="tabs" id="tabs"></div>
+      <div class="search">
+        <input id="searchInput" placeholder="Search: reflux, posture, magnesium, creatine, workout…" />
+      </div>
+    </section>
+
+    <section class="card" id="view"></section>
+
+    <footer class="footer">
+      <span id="offlineStatus">Loading…</span>
+    </footer>
+  </main>
+
+  <!-- Reminders Dialog -->
+  <dialog id="remindersDialog" class="dialog">
+    <form method="dialog" class="dialog-inner">
+      <h3>Reminders</h3>
+      <p class="muted">Reminders work best when the app is open (mobile browser limitation). Use “Skip” to stop reminders for a time block today.</p>
+
+      <div class="grid">
+        <div class="col6">
+          <div class="block">
+            <h4>Enable reminders</h4>
+            <label class="row">
+              <input type="checkbox" id="remindersEnabled" />
+              <span>Reminders ON (this device)</span>
+            </label>
+            <label class="row">
+              <input type="checkbox" id="remindersOffToday" />
+              <span>Off for today</span>
+            </label>
+            <div class="details">If “Off for today” is enabled, no reminders will fire today.</div>
+          </div>
+        </div>
+
+        <div class="col6">
+          <div class="block">
+            <h4>Times</h4>
+            <div class="row">
+              <span class="muted">Morning</span>
+              <input type="time" id="timeMorning" />
+            </div>
+            <div class="row">
+              <span class="muted">Midday</span>
+              <input type="time" id="timeMidday" />
+            </div>
+            <div class="row">
+              <span class="muted">Evening</span>
+              <input type="time" id="timeEvening" />
+            </div>
+            <div class="row">
+              <span class="muted">Bed</span>
+              <input type="time" id="timeBed" />
+            </div>
+            <div class="details">Tip: set Evening to your typical workout start time.</div>
+          </div>
+        </div>
+
+        <div class="col12">
+          <div class="block">
+            <h4>Today skip controls</h4>
+            <div class="row-wrap" id="skipButtons"></div>
+            <div class="details">Skipping a block hides its tasks and disables its reminder for today.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn ghost" value="cancel">Close</button>
+        <button class="btn" id="btnSaveReminders" value="ok">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Import Dialog -->
+  <dialog id="importDialog" class="dialog">
+    <form method="dialog" class="dialog-inner">
+      <h3>Import</h3>
+      <p class="muted">Paste a previous export JSON here (overwrites your progress on this device).</p>
+      <textarea id="importArea" spellcheck="false" placeholder='Paste JSON here'></textarea>
+      <div class="dialog-actions">
+        <button class="btn ghost" value="cancel">Cancel</button>
+        <button class="btn" id="btnImportConfirm" value="ok">Import</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="./app.js"></script>
+</body>
+</html>
