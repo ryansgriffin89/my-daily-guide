@@ -1,46 +1,46 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <title>My Daily Guide</title>
-
+  
   <link rel="manifest" href="./manifest.webmanifest" />
-  <meta name="theme-color" content="#0b0b12" />
+  <meta name="theme-color" content="#1E1E1E" />
+  
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon.png">
+
   <link rel="stylesheet" href="./styles.css" />
 </head>
 
 <body>
   <header class="topbar">
     <div class="brand">
-      <div class="logo">◎</div>
+      <div class="logo">Daily</div>
       <div>
         <div class="title">My Daily Guide</div>
-        <div class="subtitle" id="subtitle">Standalone daily operating system</div>
+        <div class="subtitle" id="subtitle">Operating System</div>
       </div>
     </div>
 
     <div class="actions">
-      <button class="btn ghost" id="btnReminders">Reminders</button>
-      <button class="btn ghost" id="btnMinimum">Minimum Day</button>
-      <button class="btn ghost" id="btnResetDay">Reset Day</button>
-      <button class="btn ghost" id="btnExport">Export</button>
-      <button class="btn ghost" id="btnImport">Import</button>
+      <button class="btn ghost" id="btnReminders" title="Reminders">🔔</button>
+      <button class="btn ghost" id="btnExport" title="Backup">💾</button>
+      <button class="btn ghost" id="btnImport" title="Restore">📂</button>
+      <button class="btn ghost" id="btnResetDay" title="Reset Today">↺</button>
     </div>
   </header>
 
   <main class="wrap">
+    
     <section class="hero">
       <div class="hero-left">
         <h1 id="todayTitle">Today</h1>
-        <p class="muted" id="todayMeta"></p>
+        <p class="muted" id="todayMeta">...</p>
       </div>
-
       <div class="hero-right">
-        <div class="pill">
-          <div class="pill-label">Day</div>
-          <div class="pill-value" id="dayBadge">—</div>
-        </div>
         <div class="pill">
           <div class="pill-label">Streak</div>
           <div class="pill-value" id="streakValue">0</div>
@@ -53,86 +53,108 @@
     </section>
 
     <section class="toolbar">
-      <div class="tabs" id="tabs"></div>
       <div class="search">
-        <input id="searchInput" placeholder="Search: reflux, posture, magnesium, creatine, workout…" />
+        <input id="searchInput" placeholder="Search tasks, supplements, logic..." />
       </div>
     </section>
 
     <section class="card" id="view"></section>
-
-    <footer class="footer">
-      <span id="offlineStatus">Loading…</span>
-    </footer>
+    
+    <div style="height: 80px;"></div>
   </main>
 
-  <!-- Reminders Dialog -->
+  <nav class="tabs" id="tabs">
+    </nav>
+
+  <dialog id="contextDialog" class="dialog">
+    <form method="dialog" class="dialog-inner">
+      <h3>Good Morning</h3>
+      <p class="muted">Set your context to adapt the schedule.</p>
+      
+      <div class="block">
+        <h4>Pain / Recovery Level</h4>
+        <div class="row-wrap" id="painOptions">
+          <label class="radio-btn">
+            <input type="radio" name="pain" value="green" checked> <span>Green (Good)</span>
+          </label>
+          <label class="radio-btn">
+            <input type="radio" name="pain" value="yellow"> <span>Yellow (Sore)</span>
+          </label>
+          <label class="radio-btn">
+            <input type="radio" name="pain" value="red"> <span>Red (Injured)</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="block">
+        <h4>Environment</h4>
+        <div class="row-wrap">
+          <select id="envSelect" class="full-width-select">
+            <option value="home">Home</option>
+            <option value="gym">Gym</option>
+            <option value="noequipment">No Equipment</option>
+            <option value="travel">Travel</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn ghost" id="btnMinimumDialog" type="button">Minimum Day</button>
+        <button class="btn" id="btnSaveContext" value="ok">Start Day</button>
+      </div>
+    </form>
+  </dialog>
+
   <dialog id="remindersDialog" class="dialog">
     <form method="dialog" class="dialog-inner">
       <h3>Reminders</h3>
-      <p class="muted">Reminders work best when the app is open (mobile browser limitation). Use “Skip” to stop reminders for a time block today.</p>
+      <p class="muted">Notifications will fire on this device.</p>
 
       <div class="grid">
         <div class="col6">
           <div class="block">
-            <h4>Enable reminders</h4>
+            <h4>Status</h4>
             <label class="row">
               <input type="checkbox" id="remindersEnabled" />
-              <span>Reminders ON (this device)</span>
+              <span>Enable Notifications</span>
             </label>
             <label class="row">
               <input type="checkbox" id="remindersOffToday" />
-              <span>Off for today</span>
+              <span>Mute Today</span>
             </label>
-            <div class="details">If “Off for today” is enabled, no reminders will fire today.</div>
           </div>
         </div>
 
         <div class="col6">
           <div class="block">
-            <h4>Times</h4>
-            <div class="row">
-              <span class="muted">Morning</span>
-              <input type="time" id="timeMorning" />
-            </div>
-            <div class="row">
-              <span class="muted">Midday</span>
-              <input type="time" id="timeMidday" />
-            </div>
-            <div class="row">
-              <span class="muted">Evening</span>
-              <input type="time" id="timeEvening" />
-            </div>
-            <div class="row">
-              <span class="muted">Bed</span>
-              <input type="time" id="timeBed" />
-            </div>
-            <div class="details">Tip: set Evening to your typical workout start time.</div>
+            <h4>Schedule</h4>
+            <div class="row"><span class="muted">Morning</span> <input type="time" id="timeMorning" /></div>
+            <div class="row"><span class="muted">Midday</span> <input type="time" id="timeMidday" /></div>
+            <div class="row"><span class="muted">Evening</span> <input type="time" id="timeEvening" /></div>
+            <div class="row"><span class="muted">Bed</span> <input type="time" id="timeBed" /></div>
           </div>
         </div>
-
+        
         <div class="col12">
-          <div class="block">
-            <h4>Today skip controls</h4>
-            <div class="row-wrap" id="skipButtons"></div>
-            <div class="details">Skipping a block hides its tasks and disables its reminder for today.</div>
-          </div>
+           <div class="block">
+              <h4>Skip Blocks Today</h4>
+              <div id="skipButtons" class="row-wrap"></div>
+           </div>
         </div>
       </div>
 
       <div class="dialog-actions">
         <button class="btn ghost" value="cancel">Close</button>
-        <button class="btn" id="btnSaveReminders" value="ok">Save</button>
+        <button class="btn" id="btnSaveReminders" value="ok">Save Settings</button>
       </div>
     </form>
   </dialog>
 
-  <!-- Import Dialog -->
   <dialog id="importDialog" class="dialog">
     <form method="dialog" class="dialog-inner">
-      <h3>Import</h3>
-      <p class="muted">Paste a previous export JSON here (overwrites your progress on this device).</p>
-      <textarea id="importArea" spellcheck="false" placeholder='Paste JSON here'></textarea>
+      <h3>Import Data</h3>
+      <p class="muted">Paste your backup JSON below. This overwrites current data!</p>
+      <textarea id="importArea" spellcheck="false" placeholder='Paste JSON here...'></textarea>
       <div class="dialog-actions">
         <button class="btn ghost" value="cancel">Cancel</button>
         <button class="btn" id="btnImportConfirm" value="ok">Import</button>
@@ -141,5 +163,13 @@
   </dialog>
 
   <script src="./app.js"></script>
+  
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log('Service Worker Registered'))
+        .catch(err => console.error('SW Fail', err));
+    }
+  </script>
 </body>
 </html>
