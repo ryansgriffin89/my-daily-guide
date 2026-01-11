@@ -4,268 +4,118 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
   <title>My Daily Guide</title>
+
+  <!-- PWA -->
   <meta name="theme-color" content="#121212" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="manifest" href="data:application/manifest+json;base64,ewogICJuYW1lIjogIk15IERhaWx5IEd1aWRlIiwKICAic2hvcnRfbmFtZSI6ICJEYWlseSIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjMTIxMjEyIiwKICAidGhlbWVfY29sb3IiOiAiIzFFMUUxRSIKfQ==" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="./manifest.webmanifest" />
 
-  <style>
-    :root {
-      --primary: #D0BCFF; --primary-dim: rgba(208, 188, 255, 0.1);
-      --bg: #121212; --surface: #1E1E1E; --surface-2: #2C2C2C;
-      --on-surface: #E6E1E5; --muted: #938F99; --success: #81C784; 
-      --radius: 16px; --font: 'Roboto', system-ui, sans-serif;
-    }
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body { margin: 0; background: var(--bg); color: var(--on-surface); font-family: var(--font); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
-    
-    main { flex: 1; overflow-y: auto; padding: 16px; padding-bottom: 100px; }
-    
-    header { padding: 16px 20px; background: var(--surface); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); z-index: 10; }
-    .brand h1 { font-size: 18px; color: var(--primary); margin: 0; }
-    
-    /* TASKS */
-    .task-item { background: var(--surface-2); border-radius: 12px; padding: 16px; margin-bottom: 12px; display: flex; flex-direction: column; }
-    .task-row { display: flex; align-items: flex-start; gap: 16px; width: 100%; }
-    
-    .chk { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--muted); flex-shrink: 0; display: grid; place-items: center; margin-top: 2px; cursor: pointer; }
-    .chk.done { background: var(--success); border-color: var(--success); color: #000; }
-    
-    .task-content { flex: 1; }
-    .task-title { font-size: 16px; margin-bottom: 4px; font-weight: 500; }
-    .task-meta { font-size: 11px; color: var(--primary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-    
-    /* DETAILS */
-    .details-box { 
-      background: rgba(0,0,0,0.2); margin-top: 12px; padding: 12px; border-radius: 8px; 
-      font-size: 13px; color: var(--muted); line-height: 1.6; display: none; 
-      border-left: 2px solid var(--primary);
-    }
-    .task-item.expanded .details-box { display: block; }
-    .toggle-text { font-size: 11px; color: var(--muted); text-decoration: underline; margin-top: 6px; cursor: pointer; }
-
-    .sub-list { list-style: none; padding: 0; margin: 8px 0 0 0; }
-    .sub-list li { display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start; }
-    .sub-list li:before { content: "•"; color: var(--primary); font-weight: bold; }
-
-    /* NAV */
-    nav.tabs { position: fixed; bottom: 0; width: 100%; background: var(--surface); display: flex; justify-content: space-around; padding: 10px 0 25px 0; border-top: 1px solid #333; z-index: 20; }
-    .tab-btn { background: none; border: none; color: var(--muted); font-size: 10px; display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 16px; border-radius: 20px; }
-    .tab-btn.active { color: var(--primary); background: var(--primary-dim); }
-
-    /* UTILS */
-    .btn { background: var(--primary); color: #000; border: none; padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-    .btn.ghost { background: transparent; color: var(--muted); }
-    h3 { color: var(--primary); margin: 20px 0 10px 0; text-transform: uppercase; font-size: 14px; letter-spacing: 1px; }
-
-    /* DIALOG */
-    dialog { background: var(--surface); color: white; border: none; border-radius: var(--radius); width: 90%; max-width: 400px; padding: 20px; }
-    dialog::backdrop { background: rgba(0,0,0,0.8); }
-    .chip { background: #333; padding: 8px 12px; border-radius: 20px; font-size: 13px; border: 1px solid transparent; cursor: pointer; margin: 5px; display: inline-block;}
-    .chip.active { background: var(--primary-dim); color: var(--primary); border-color: var(--primary); }
-  </style>
+  <!-- Styles -->
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 
 <body>
-  <header>
-    <div class="brand"><h1>Daily Guide</h1></div>
-    <button class="btn ghost" onclick="document.getElementById('contextDialog').showModal()">Check-in</button>
-  </header>
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+      <div>
+        <h1 style="margin:0;">My Daily Guide</h1>
+        <div id="todayMeta" class="details" style="margin-top:6px;">Loading…</div>
+      </div>
 
-  <main id="view"></main>
-  <nav class="tabs" id="navTabs"></nav>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button id="btnReminders" class="btn ghost">Reminders</button>
+        <button id="btnResetDay" class="btn ghost">Reset</button>
+      </div>
+    </div>
 
-  <dialog id="contextDialog">
-    <form method="dialog">
-      <h3 style="margin-top:0">Context</h3>
-      <p>Pain Level:</p>
-      <div id="painChips"><span class="chip" onclick="app.setCtx('pain','green',this)">Green</span><span class="chip" onclick="app.setCtx('pain','yellow',this)">Yellow</span><span class="chip" onclick="app.setCtx('pain','red',this)">Red</span></div>
-      <p>Environment:</p>
-      <div id="envChips"><span class="chip" onclick="app.setCtx('env','home',this)">Home</span><span class="chip" onclick="app.setCtx('env','gym',this)">Gym</span></div>
-      <div style="margin-top:20px; text-align:right"><button class="btn">Done</button></div>
-    </form>
+    <!-- Stats Row -->
+    <div style="display:flex; gap:14px; margin-top:12px; flex-wrap:wrap;">
+      <div class="block" style="padding:12px 14px; margin:0;">
+        <div class="details">Done</div>
+        <div id="doneValue" style="font-size:18px; font-weight:600;">0/0</div>
+      </div>
+      <div class="block" style="padding:12px 14px; margin:0;">
+        <div class="details">Streak</div>
+        <div id="streakValue" style="font-size:18px; font-weight:600;">0</div>
+      </div>
+      <div class="block" style="padding:12px 14px; margin:0;">
+        <div class="details">Mode</div>
+        <div id="dayBadge" style="font-size:14px; font-weight:600;">—</div>
+      </div>
+      <div class="block" style="padding:12px 14px; margin:0;">
+        <div class="details">Status</div>
+        <div id="offlineStatus" style="font-size:14px; font-weight:600;">Loading…</div>
+      </div>
+    </div>
+
+    <!-- Search -->
+    <div style="margin-top:12px;">
+      <input id="searchInput" placeholder="Search tasks…" style="width:100%; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background:#141414; color:#fff;" />
+    </div>
+
+    <!-- Action Buttons -->
+    <div style="display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;">
+      <button id="btnMinimum" class="btn">Minimum Day</button>
+      <button id="btnExport" class="btn ghost">Export</button>
+      <button id="btnImport" class="btn ghost">Import</button>
+    </div>
+  </div>
+
+  <!-- Main View -->
+  <main style="padding:16px; padding-bottom:110px;">
+    <div class="section-title" id="todayTitle" style="font-size:14px; text-transform:uppercase; letter-spacing:1px; margin:6px 0 12px 0;">Today</div>
+    <div id="view"></div>
+  </main>
+
+  <!-- Bottom Tabs (app.js expects id="tabs") -->
+  <nav class="tabs" id="tabs"></nav>
+
+  <!-- Import Dialog (app.js expects these IDs) -->
+  <dialog id="importDialog">
+    <h3 style="margin-top:0;">Import</h3>
+    <div class="details">Paste JSON from a previous export.</div>
+    <textarea id="importArea" style="width:100%; height:180px; margin-top:10px; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background:#141414; color:#fff;"></textarea>
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:12px;">
+      <button class="btn ghost" onclick="document.getElementById('importDialog').close()">Cancel</button>
+      <button id="btnImportConfirm" class="btn">Confirm</button>
+    </div>
   </dialog>
 
-  <script>
-    // --- FULL DATASET FROM YOUR PDFS ---
-    const GUIDE_DATA = {
-      tabs: [
-        { id: "today", label: "Today", icon: "📅" },
-        { id: "rehab", label: "Rehab", icon: "🦴" },
-        { id: "workouts", label: "Train", icon: "💪" },
-        { id: "diet", label: "Diet", icon: "🥗" },
-        { id: "skills", label: "Skills", icon: "🎸" }
-      ],
-      tasks: [
-        // --- MORNING ---
-        {
-          id: "m_rehab", title: "Morning Rehab & Structure", block: "morning", tags: ["rehab", "core"],
-          why: "Prepare body structure",
-          how: "Full sequence from Section 3.",
-          details: [
-            "Neck: Scalene release & SCM decompression",
-            "Neck: First rib mobilization & Levator stretch",
-            "Neck: Deep neck flexor activations",
-            "Scapula: Serratus anterior drills",
-            "Diaphragm: Activation drills (Section 1)"
-          ]
-        },
-        {
-          id: "m_vocal", title: "Morning Vocal Warm-up", block: "morning", tags: ["skill"],
-          why: "Breath support & tone",
-          how: "Light activation only.",
-          details: ["Diaphragm activation", "Light vocal warm-up drills"]
-        },
-        {
-          id: "m_stack", title: "Morning Supplement Stack", block: "morning", tags: ["supps"],
-          why: "Metabolism & Brain",
-          how: "Take with breakfast.",
-          details: [
-            "Multivitamin (One A Day)",
-            "Vitamin D3 (5,000 IU)",
-            "Omega-3 (Salmon Oil)",
-            "Choline + Inositol (Focus)",
-            "Probiotic (Jarrow)",
-            "Optional: Acetyl-L-Carnitine"
-          ]
-        },
+  <!-- Reminders Dialog (app.js expects these IDs) -->
+  <dialog id="remindersDialog">
+    <h3 style="margin-top:0;">Reminders</h3>
 
-        // --- MIDDAY / WORKOUT ---
-        {
-          id: "w_prep", title: "Pre-Workout Prep", block: "midday", tags: ["workout"],
-          why: "Fuel & Activation",
-          how: "30m before training.",
-          details: [
-            "Creatine (5g)",
-            "Knee: VMO activation",
-            "Knee: Tibial internal/external rotation resets",
-            "Hip mobility check"
-          ]
-        },
-        {
-          id: "w_session", title: "Training Session", block: "midday", tags: ["workout"],
-          why: "Strength & Hypertrophy",
-          how: "Follow split (Upper/Lower/Core).",
-          details: [
-            "Warm-up: Scap circles & Rhomboid decompression",
-            "Safety: Check form cues on main lifts",
-            "Rehab: Low trap activation between sets"
-          ]
-        },
-        {
-          id: "diet_main", title: "OMAD / Nutrition", block: "midday", tags: ["diet"],
-          why: "Weight Control (185lb target)",
-          how: "Anti-inflammatory focus.",
-          details: [
-            "Hit Protein/Macro targets",
-            "Low-cholesterol strategy",
-            "Electrolyte protocol",
-            "Hunger control management"
-          ]
-        },
-        {
-          id: "w_reset", title: "Posture Resets", block: "midday", tags: ["rehab"],
-          why: "Prevent stiffness",
-          how: "Every 60-90 minutes.",
-          details: ["Thoracic extension", "Neck retraction", "Walk/Move"]
-        },
-        {
-          id: "mental_focus", title: "ADHD Focus Block", block: "midday", tags: ["mental"],
-          why: "Productivity",
-          how: "Phone detox micro-habits.",
-          details: ["Screen-down protocol", "Stress cycle completion technique"]
-        },
+    <label style="display:flex; gap:10px; align-items:center; margin:10px 0;">
+      <input id="remindersEnabled" type="checkbox" />
+      <span>Enable reminders</span>
+    </label>
 
-        // --- EVENING ---
-        {
-          id: "e_family", title: "Family System (Kids 3 & 5)", block: "evening", tags: ["family"],
-          why: "Bonding & Development",
-          how: "Dedicated block.",
-          details: [
-            "Bonding rituals (Ages 3 & 5)",
-            "Restaurant activity training (Weekend prep)",
-            "Couple connection routine"
-          ]
-        },
-        {
-          id: "e_guitar", title: "Guitar Training System", block: "evening", tags: ["skill"],
-          why: "Mastery (Section 9)",
-          how: "Daily practice plan.",
-          details: [
-            "Finger dexterity drills",
-            "Beginner chord system",
-            "Strumming mastery",
-            "Singing + playing integration"
-          ]
-        },
-        {
-          id: "e_singing", title: "Advanced Singing", block: "evening", tags: ["skill"],
-          why: "Range & Tone (Section 4)",
-          how: "Drills & Practice.",
-          details: [
-            "False-fold rasp technique",
-            "Range mapping & Key discovery",
-            "Video practice flow integration"
-          ]
-        },
-        {
-          id: "e_stack", title: "Sleep Stack & Recovery", block: "evening", tags: ["supps", "sleep"],
-          why: "Cortisol & Sleep",
-          how: "45-60m before bed.",
-          details: [
-            "Ashwagandha (1,000 mg)",
-            "Magnesium Glycinate (200-400mg)",
-            "Optional: HMB (Muscle preservation)",
-            "Phone detox"
-          ]
-        }
-      ]
-    };
+    <label style="display:flex; gap:10px; align-items:center; margin:10px 0;">
+      <input id="remindersOffToday" type="checkbox" />
+      <span>Off today</span>
+    </label>
 
-    const app = {
-      state: { tab: 'today', date: new Date().toLocaleDateString('en-CA'), completions: JSON.parse(localStorage.getItem('mdg_d')||'{}'), context: JSON.parse(localStorage.getItem('mdg_c')||'{}') },
-      init() { this.renderTabs(); this.render(); },
-      save() { localStorage.setItem('mdg_d', JSON.stringify(this.state.completions)); localStorage.setItem('mdg_c', JSON.stringify(this.state.context)); this.render(); },
-      toggle(id) { const k=`${this.state.date}_${id}`; this.state.completions[k] ? delete this.state.completions[k] : this.state.completions[k]=true; this.save(); },
-      setCtx(k,v,el) { this.state.context[k]=v; this.save(); },
-      renderTabs() { document.getElementById('navTabs').innerHTML=GUIDE_DATA.tabs.map(t=>`<button class="tab-btn ${this.state.tab===t.id?'active':''}" onclick="app.tab('${t.id}')">${t.icon}<br>${t.label}</button>`).join(''); },
-      tab(id) { this.state.tab=id; this.renderTabs(); this.render(); },
-      render() {
-        const v = document.getElementById('view');
-        let list = GUIDE_DATA.tasks;
-        if(this.state.tab!=='today') {
-           const map = {'rehab':['rehab'],'workouts':['workout'],'diet':['diet','supps'],'skills':['skill','family']};
-           list = list.filter(t=>t.tags.some(tag=>(map[this.state.tab]||[]).includes(tag)));
-        }
-        const done = GUIDE_DATA.tasks.filter(t=>this.state.completions[`${this.state.date}_${t.id}`]).length;
-        
-        let h = this.state.tab==='today' ? `<div style="margin-bottom:20px"><h1>${new Date().toLocaleDateString('en-US',{weekday:'long'})}</h1><p>${done}/${GUIDE_DATA.tasks.length} Done</p></div>` : '';
-        
-        ['morning','midday','evening'].forEach(b => {
-           const bl = list.filter(t=>t.block===b);
-           if(bl.length) {
-             h += `<h3>${b}</h3>` + bl.map(t => {
-               const k = `${this.state.date}_${t.id}`;
-               const isDone = !!this.state.completions[k];
-               const dList = t.details ? `<ul class="sub-list">${t.details.map(d=>`<li>${d}</li>`).join('')}</ul>` : '';
-               return `<div class="task-item" onclick="this.classList.toggle('expanded')">
-                 <div class="task-row">
-                   <div class="chk ${isDone?'done':''}" onclick="event.stopPropagation();app.toggle('${t.id}')">${isDone?'✓':''}</div>
-                   <div class="task-content">
-                     <div class="task-title">${t.title}</div>
-                     <div class="task-meta">${t.tags.join(' • ')}</div>
-                     <div class="toggle-text">Details ▼</div>
-                   </div>
-                 </div>
-                 <div class="details-box"><b>Why:</b> ${t.why}<br><b>How:</b> ${t.how}${dList}</div>
-               </div>`;
-             }).join('');
-           }
-        });
-        v.innerHTML = h || '<p style="text-align:center;margin-top:40px">No tasks found.</p>';
-      }
-    };
-    app.init();
-  </script>
+    <div class="details" style="margin:10px 0;">Times</div>
+
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <label>Morning <input id="timeMorning" type="time" style="width:100%; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background:#141414; color:#fff;" /></label>
+      <label>Midday <input id="timeMidday" type="time" style="width:100%; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background:#141414; color:#fff;" /></label>
+      <label>Evening <input id="timeEvening" type="time" style="width:100%; padding:10px; border-radius:12px; border:1px solid rgba(255,255255,255,0.08); background:#141414; color:#fff;" /></label>
+      <label>Bed <input id="timeBed" type="time" style="width:100%; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.08); background:#141414; color:#fff;" /></label>
+    </div>
+
+    <div class="details" style="margin:14px 0 8px;">Skip blocks today</div>
+    <div id="skipButtons" style="display:flex; gap:8px; flex-wrap:wrap;"></div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+      <button class="btn ghost" onclick="document.getElementById('remindersDialog').close()">Close</button>
+      <button id="btnSaveReminders" class="btn">Save</button>
+    </div>
+  </dialog>
+
+  <!-- App Script -->
+  <script src="./app.js"></script>
 </body>
 </html>
